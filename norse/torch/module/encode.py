@@ -3,6 +3,7 @@ Stateful encoders as torch modules.
 """
 
 from typing import Union, Callable
+from typing import Optional
 import torch
 
 from norse.torch.functional import lif
@@ -231,3 +232,23 @@ class SpikeLatencyEncoder(torch.nn.Module):
 
     def forward(self, input_spikes):
         return encode.spike_latency_encode(input_spikes)
+
+
+class RankOrderEncoder(torch.nn.Module):
+    """Encode neurons by rank"""
+
+    def __init__(
+        self,
+        mod: float,
+        cutoff: Optional[int] = None,
+        *args,
+        **kwargs,
+    ):
+
+        self.mod = mod
+        self.cutoff = cutoff
+
+        super().__init__(*args, **kwargs)
+
+    def forward(self, input_spike_times):
+        return encode.rank_order_encode(input_spike_times, self.mod, self.cutoff)

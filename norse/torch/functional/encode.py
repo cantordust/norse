@@ -5,6 +5,7 @@ but rather numerical values that will have to be converted into spikes via, for 
 """
 
 from typing import Callable, Union
+from typing import Optional
 
 import torch
 
@@ -292,3 +293,21 @@ def spike_latency_encode(input_spikes: torch.Tensor) -> torch.Tensor:
         spikes.append(torch.where(mask, zero_spikes, input_spikes[index]))
         mask[input_spikes[index].bool()] = 1
     return torch.stack(spikes)
+
+
+def rank_order_encode(
+    input_spike_times: torch.Tensor,
+    mod: float,
+    cutoff: Optional[int] = None,
+) -> torch.Tensor:
+
+    # Sort the spike times in ascending order
+    (sorted, ranks) = torch.sort(input_spike_times, stable=True, descending=False)
+
+    if cutoff:
+        infs = torch.ones_like(input_spike_times) * torch.inf
+        ranks = torch.where(ranks < cutoff, ranks, infs)
+
+    contrib = torch.pow(mod, ranks)
+
+    return contrib
