@@ -183,6 +183,7 @@ __all__ = [
     "signed_poisson_encode_step",
     "spike_latency_encode",
     "spike_latency_lif_encode",
+    "rank_order_encode",
     # IAF
     "IAFFeedForwardState",
     "IAFParameters",
