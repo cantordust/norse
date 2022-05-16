@@ -65,7 +65,7 @@ def gaussian_rbf(tensor: torch.Tensor, sigma: float = 1):
         tensor (torch.Tensor): The tensor containing distance values to convert to radial bases
         sigma (float): The spread of the gaussian distribution. Defaults to 1.
     """
-    return torch.exp(-tensor / (2 * sigma ** 2))
+    return torch.exp(-tensor / (2 * sigma**2))
 
 
 def euclidean_distance(x, y):
@@ -296,18 +296,19 @@ def spike_latency_encode(input_spikes: torch.Tensor) -> torch.Tensor:
 
 
 def rank_order_encode(
-    input_spike_times: torch.Tensor,
+    inputs: torch.Tensor,
     mod: float,
     cutoff: Optional[int] = None,
 ) -> torch.Tensor:
 
     # Sort the spike times in ascending order
-    (sorted, ranks) = torch.sort(input_spike_times, stable=True, descending=False)
+    (sorted, ranks) = torch.sort(inputs, stable=True, descending=False)
 
     if cutoff:
-        infs = torch.ones_like(input_spike_times) * torch.inf
+        infs = torch.ones_like(inputs) * torch.inf
         ranks = torch.where(ranks < cutoff, ranks, infs)
 
-    contrib = torch.pow(mod, ranks)
+    # Compute the activations
+    activations = torch.pow(mod, ranks)
 
-    return contrib
+    return activations

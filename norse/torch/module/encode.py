@@ -235,7 +235,21 @@ class SpikeLatencyEncoder(torch.nn.Module):
 
 
 class RankOrderEncoder(torch.nn.Module):
-    """Encode neurons by rank"""
+    """Encode neurons by rank.
+
+    The activation of neuron $i$ at time $t$ is defined as:
+
+    $$ A(i,t) = \sum_{\j \in [1,m]}{mod^{order(a_{j})}w_{j,i}}, $$
+
+    where:
+
+    - $$ mod \in (0,1) $$ is a modifier that determines the amount of 'desensitisation' to each subsequent input;
+    - $$ order(a_{j}) $$ is the index of neuron $$ j $$ in the list of neurons sorted by spiking order;
+    - $$ w_{j, i} $$ is the weight of the connection between neurons $$ j $$ and $$ i $$.
+
+    Cf. `Delorme, A., Perrinet, L., & Thorpe, S. J. (2001). Networks of integrate-and-fire neurons using rank order coding B: spike timing dependent plasticity and emergence of orientation selectivity. Neurocomputing, 38, 539–545.` for more details.
+
+    """
 
     def __init__(
         self,
@@ -250,5 +264,5 @@ class RankOrderEncoder(torch.nn.Module):
 
         super().__init__(*args, **kwargs)
 
-    def forward(self, input_spike_times):
-        return encode.rank_order_encode(input_spike_times, self.mod, self.cutoff)
+    def forward(self, inputs):
+        return encode.rank_order_encode(inputs, self.mod, self.cutoff)
