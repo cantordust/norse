@@ -299,16 +299,21 @@ def rank_order_encode(
     inputs: torch.Tensor,
     mod: float,
     cutoff: Optional[int] = None,
+    dim: int = 1,
+    sum: bool = False,
 ) -> torch.Tensor:
 
-    # Sort the spike times in ascending order
-    (sorted, ranks) = torch.sort(inputs, stable=True, descending=False)
-
-    if cutoff:
-        infs = torch.ones_like(inputs) * torch.inf
-        ranks = torch.where(ranks < cutoff, ranks, infs)
+    # Sort the spike order
+    (sorted, ranks) = torch.sort(inputs, dim=dim, stable=True)
 
     # Compute the activations
-    activations = torch.pow(mod, ranks)
+    substrate = torch.full_like(inputs, mod)
+
+    activations = torch.pow(substrate, ranks.float())
+
+    if cutoff is not None:
+        cutoff = int(cutoff * inputs.shape[dim])
+        baseline = torch.zeros_like(activations)
+        activations = torch.where(ranks > cutoff, activations, baseline)
 
     return activations

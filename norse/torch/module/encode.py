@@ -255,14 +255,16 @@ class RankOrderEncoder(torch.nn.Module):
         self,
         mod: float,
         cutoff: Optional[int] = None,
+        dim: int = 1,
         *args,
         **kwargs,
     ):
 
-        self.mod = mod
-        self.cutoff = cutoff
-
         super().__init__(*args, **kwargs)
 
-    def forward(self, inputs):
-        return encode.rank_order_encode(inputs, self.mod, self.cutoff)
+        self.mod = mod
+        self.cutoff = cutoff
+        self.dim = dim
+
+    def forward(self, inputs: torch.Tensor):
+        return encode.rank_order_encode(inputs, self.mod, self.cutoff, self.dim)
